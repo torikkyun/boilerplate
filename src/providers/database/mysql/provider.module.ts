@@ -12,7 +12,7 @@ import { ConfigService } from '@nestjs/config';
         username: configService.get('MYSQL_ROOT_USERNAME'),
         password: configService.get('MYSQL_ROOT_PASSWORD'),
         database: configService.get('MYSQL_DATABASE'),
-        entities: [__dirname + '/../../../**/*.entity{.ts,.js}'],
+        autoLoadEntities: true,
         synchronize: configService.get('NODE_ENV') !== 'production',
         logging: configService.get('NODE_ENV') !== 'production',
       }),
