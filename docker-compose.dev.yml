@@ -6,8 +6,21 @@ services:
       - '3307:3306'
     env_file:
       - .env.development.local
+      - .env.development
     volumes:
       - ./mysql_data:/var/lib/mysql
 
+  # postgres:
+  #   image: postgres:17-bookworm
+  #   restart: always
+  #   ports:
+  #     - '5433:5432'
+  #   env_file:
+  #     - .env.development.local
+  #     - .env.development
+  #   volumes:
+  #     - ./postgres_data:/var/lib/postgresql
+
 volumes:
   mysql_data:
+  # postgres_data:
