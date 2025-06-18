@@ -6,7 +6,7 @@
 pnpm add -g degit
 degit torikkyun/nest-boilerplate skibidi
 cd skibidi
-pnpm i
+pnpm install
 docker-compose -f docker-compose.dev.yml up -d --build
 ```
 
