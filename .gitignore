@@ -3,7 +3,6 @@ mysql_data
 postgres_data
 mongo_data
 *.tar
-/generated/prisma
 
 # compiled output
 /dist
@@ -61,7 +60,5 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
-
-/generated/prisma
 
 /generated/prisma
