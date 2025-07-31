@@ -1,9 +1,3 @@
-# Custom
-mysql_data
-postgres_data
-mongo_data
-*.tar
-
 # compiled output
 /dist
 /node_modules
