@@ -33,7 +33,11 @@ async function bootstrap() {
     })
     .build();
 
-  SwaggerModule.setup('api', app, SwaggerModule.createDocument(app, config));
+  SwaggerModule.setup(
+    configService.get('SWAGGER_PATH') ?? 'swagger',
+    app,
+    SwaggerModule.createDocument(app, config),
+  );
 
   await app.listen(configService.get('PORT') ?? 3000);
 }
