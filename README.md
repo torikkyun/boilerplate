@@ -1,98 +1,66 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Nest Boilerplate
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Thực hiện theo: [Best Folder Structure for NestJS Projects (2025 Guide) - Nairi Abgaryan](https://medium.com/@nairi.abgaryan/stop-the-chaos-clean-folder-file-naming-guide-for-backend-nest-js-and-node-331fdc6400cb)
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Cấu trúc thư mục
 
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ pnpm install
+```plaintext
+src/
+├── core/           # Hạ tầng nội bộ dùng chung (auth, logger, redis, mail...)
+├── common/         # Tiện ích dùng chung (pipes, decorators, types...)
+├── integrations/   # Wrapper cho dịch vụ bên ngoài (Stripe, AWS, PayTech...)
+├── modules/        # Các module nghiệp vụ chính (user, transaction, account...)
+├── events/         # Logic sự kiện (publish/subscribe)
+├── commands/       # Các job CLI hoặc CRON
+├── app.module.ts   # Module gốc của ứng dụng
+└── main.ts         # Điểm khởi chạy ứng dụng
 ```
 
-## Compile and run the project
+## Quy tắc đặt tên
+
+| Loại file        | Quy tắc đặt tên                     | Ví dụ                          |
+|------------------|-------------------------------------|--------------------------------|
+| Module           | `[name].module.ts`                  | `user.module.ts`              |
+| Service          | `[name].service.ts`                 | `auth.service.ts`             |
+| DTO              | `[action]-[entity].dto.ts`          | `create-user.dto.ts`          |
+| Client           | `[provider]-[entity].client.ts`     | `stripe-payment.client.ts`    |
+| Guard / Pipe     | `[name].guard.ts` / `[name].pipe.ts`| `jwt.guard.ts`, `trim.pipe.ts`|
+
+## Nguyên tắc phân loại file
+
+- **Tính năng nghiệp vụ** -> `modules/[feature]/`
+- **DTO** -> `modules/[feature]/dto/`
+- **Tiện ích hoặc decorator**
+  - Dùng riêng cho module -> `modules/[feature]/utils/`
+  - Dùng toàn cục -> `common/utils/`
+- **Cấu hình hạ tầng (auth, redis...)** -> `core/`
+- **Wrapper dịch vụ bên ngoài** -> `integrations/`
+- **Job CLI hoặc CRON** -> `commands/`
+- **Sự kiện (Event)** -> `events/`
+- **Kiểm thử (Test)** -> `test/`
+
+## Testing
+
+| Loại test   | Vị trí đặt file                        | Ví dụ                         |
+|-------------|----------------------------------------|-------------------------------|
+| Unit Test   | Cùng thư mục với file chính            | `user.service.spec.ts`        |
+| E2E Test    | Trong thư mục `test/` hoặc `e2e/`      | `user.e2e-spec.ts`            |
+
+## Hướng dẫn cài đặt
 
 ```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+pnpm install
 ```
 
-## Run tests
+## Chạy dự án
 
 ```bash
-# unit tests
-$ pnpm run test
+# Chạy ở môi trường phát triển
+pnpm start:dev
 
-# e2e tests
-$ pnpm run test:e2e
+# Chạy test
+pnpm test
 
-# test coverage
-$ pnpm run test:cov
+# Chạy e2e test
+pnpm test:e2e
 ```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
