@@ -1,4 +1,6 @@
 import { AuthModule } from '@core/auth/auth.module';
+import { JwtGuard } from '@core/auth/guards/jwt.guard';
+import { RolesGuard } from '@core/auth/guards/roles.guard';
 import { UsersModule } from '@modules/users/users.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -12,6 +14,16 @@ import { ConfigModule } from '@nestjs/config';
     }),
     AuthModule,
     UsersModule,
+  ],
+  providers: [
+    {
+      provide: 'APP_GUARD',
+      useClass: JwtGuard,
+    },
+    {
+      provide: 'APP_GUARD',
+      useClass: RolesGuard,
+    },
   ],
 })
 export class AppModule {}
