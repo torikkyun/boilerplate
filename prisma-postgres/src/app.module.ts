@@ -4,6 +4,7 @@ import { RolesGuard } from '@core/auth/guards/roles.guard';
 import { UsersModule } from '@modules/users/users.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ProfilesModule } from './modules/profiles/profiles.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ConfigModule } from '@nestjs/config';
     }),
     AuthModule,
     UsersModule,
+    ProfilesModule,
   ],
   providers: [
     {
