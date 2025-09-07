@@ -33,6 +33,7 @@ compose*.yaml
 prisma/dev.db
 prisma/*.sqlite
 prisma/generated/
+generated/
 
 # Docs & Misc
 *.md
