@@ -50,17 +50,33 @@ src/
 
 ```bash
 pnpm install
+
+# Khởi động database với docker
+docker compose -f compose.db.yml up -d --build
+```
+
+## Hướng dẫn tạo file môi trường
+
+```bash
+# development
+cp .env.dev .env.development.local
+
+# production
+cp .env.prod .env.production.local
 ```
 
 ## Chạy dự án
 
 ```bash
-# Chạy ở môi trường phát triển
+# development
 pnpm start:dev
 
-# Chạy test
+# test
 pnpm test
 
-# Chạy e2e test
+# e2e test
 pnpm test:e2e
+
+# production với docker
+docker compose -f compose.yml --env-file .env.production.local up -d --build
 ```

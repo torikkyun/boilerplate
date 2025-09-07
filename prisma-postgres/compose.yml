@@ -1,0 +1,42 @@
+services:
+  db:
+    image: postgres
+    container_name: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=prisma-postgres
+    ports:
+      - "5433:5432"
+    networks:
+      - prisma-postgres
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 2s
+      retries: 20
+
+  server:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: prisma-postgres
+    restart: always
+    ports:
+      - "2412:2412"
+    networks:
+      - prisma-postgres
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env.production.local
+
+volumes:
+  postgres:
+
+networks:
+  prisma-postgres:
