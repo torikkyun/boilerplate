@@ -6,15 +6,15 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=prisma-postgres
+      - POSTGRES_DB=nest-prisma-postgres
     ports:
       - "5433:5432"
     networks:
-      - prisma-postgres
+      - nest-prisma-postgres
     volumes:
       - ./postgres:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d nest-prisma-postgres"]
       interval: 5s
       timeout: 2s
       retries: 20
@@ -23,12 +23,12 @@ services:
     build:
       context: .
       dockerfile: dockerfile
-    container_name: prisma-postgres
+    container_name: nest-prisma-postgres
     restart: always
     ports:
       - "2412:2412"
     networks:
-      - prisma-postgres
+      - nest-prisma-postgres
     depends_on:
       db:
         condition: service_healthy
@@ -39,4 +39,4 @@ volumes:
   postgres:
 
 networks:
-  prisma-postgres:
+  nest-prisma-postgres:

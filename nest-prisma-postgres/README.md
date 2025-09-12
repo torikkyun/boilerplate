@@ -1,4 +1,4 @@
-# Nest Boilerplate
+# Nest Prisma Postgres Boilerplate
 
 Thực hiện theo: [Best Folder Structure for NestJS Projects (2025 Guide) - Nairi Abgaryan](https://medium.com/@nairi.abgaryan/stop-the-chaos-clean-folder-file-naming-guide-for-backend-nest-js-and-node-331fdc6400cb)
 
