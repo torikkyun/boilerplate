@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { LoginAuthDto } from './login-auth.dto';
 import {
   IsNotEmpty,
   IsNumber,
@@ -7,8 +6,9 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { LoginUserDto } from './login-user.dto';
 
-export class RegisterAuthDto extends LoginAuthDto {
+export class RegisterUserDto extends LoginUserDto {
   @IsNotEmpty()
   @IsString()
   @MaxLength(50)

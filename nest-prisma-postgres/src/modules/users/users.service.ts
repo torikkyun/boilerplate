@@ -1,12 +1,70 @@
 import { PrismaService } from '@core/prisma/prisma.service';
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { SearchUserDto } from './dto/search-user.dto';
-import { Prisma } from 'generated/prisma';
+import { Prisma, User } from 'generated/prisma';
 import { PaginatedResponseDto } from '@common/dtos/pagination.dto';
+import { RegisterUserDto } from './dto/register-user.dto';
+import * as bcrypt from 'bcrypt';
+import { LoginUserDto } from './dto/login-user.dto';
+import { UnauthorizedException } from '@nestjs/common/exceptions';
+import { AuthService } from '@core/auth/auth.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly authService: AuthService,
+  ) {}
+
+  async register({
+    email,
+    password,
+    name,
+    age,
+  }: RegisterUserDto): Promise<{ message: string; email: string }> {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      select: { id: true },
+    });
+
+    if (user) {
+      throw new ConflictException('Email đã được đăng ký');
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await this.prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        name,
+        Profile: {
+          create: { age },
+        },
+      },
+    });
+
+    return {
+      message: 'Đăng ký tài khoản thành công',
+      email,
+    };
+  }
+
+  async login({ email, password }: LoginUserDto): Promise<{
+    message: string;
+    user: Omit<User, 'password'>;
+    accessToken: string;
+  }> {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+
+    if (user && (await bcrypt.compare(password, user.password))) {
+      const { password: _password, ...userData } = user;
+      const accessToken = await this.authService.generateAccessToken(user);
+      return { message: 'Đăng nhập thành công', user: userData, accessToken };
+    }
+
+    throw new UnauthorizedException('Email hoặc mật khẩu không đúng');
+  }
 
   async findAll({
     email,
