@@ -76,14 +76,6 @@ export class UsersService {
   }: SearchUserDto): Promise<
     PaginatedResponseDto<Omit<Prisma.UserGetPayload<object>, 'password'>>
   > {
-    // const cacheKey = `users:findAll:${email ?? ''}:${page}:${limit}:${skip}`;
-    // const cached = await this.redisService.get(cacheKey);
-    // if (cached) {
-    //   return cached as PaginatedResponseDto<
-    //     Omit<Prisma.UserGetPayload<object>, 'password'>
-    //   >;
-    // }
-
     const where: Prisma.UserWhereInput = {
       ...(email && { email: { contains: email, mode: 'insensitive' } }),
     };
@@ -111,8 +103,6 @@ export class UsersService {
         totalPages: Math.ceil(total / limit),
       },
     };
-
-    // await this.redisService.set(cacheKey, result);
 
     return result;
   }
