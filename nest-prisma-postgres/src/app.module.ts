@@ -7,6 +7,7 @@ import { ProfilesModule } from '@modules/profiles/profiles.module';
 import { UsersModule } from '@modules/users/users.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { RedisModule } from './core/redis/redis.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ConfigModule } from '@nestjs/config';
     AuthModule,
     UsersModule,
     ProfilesModule,
+    RedisModule,
   ],
   providers: [
     SeedDatabaseCommand,

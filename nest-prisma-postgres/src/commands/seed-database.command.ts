@@ -13,10 +13,7 @@ export class SeedDatabaseCommand extends CommandRunner {
     super();
   }
 
-  async run(
-    passedParams: string[],
-    options?: Record<string, any>,
-  ): Promise<void> {
+  async run(): Promise<void> {
     const passwordHash = bcrypt.hashSync('123456', 10);
 
     try {
@@ -25,7 +22,7 @@ export class SeedDatabaseCommand extends CommandRunner {
 
       const adminUser = await this.prisma.user.create({
         data: {
-          email: 'admin@example.com',
+          email: 'admin@gmail.com',
           name: 'System Admin',
           password: passwordHash,
           Profile: {
@@ -41,8 +38,8 @@ export class SeedDatabaseCommand extends CommandRunner {
       console.log(`✅ Admin user đã được tạo: ${adminUser.email}`);
 
       const sampleUsers = [
-        { email: 'user1@example.com', name: 'John Doe', age: 25 },
-        { email: 'user2@example.com', name: 'Jane Smith', age: 28 },
+        { email: 'user1@gmail.com', name: 'John Doe', age: 25 },
+        { email: 'user2@gmail.com', name: 'Jane Smith', age: 28 },
       ];
 
       for (const userData of sampleUsers) {

@@ -39,3 +39,5 @@ generated/
 *.md
 LICENSE
 README.md
+makefile
+Makefile

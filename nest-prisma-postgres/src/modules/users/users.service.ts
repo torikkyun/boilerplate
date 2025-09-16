@@ -8,12 +8,14 @@ import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UnauthorizedException } from '@nestjs/common/exceptions';
 import { AuthService } from '@core/auth/auth.service';
+import { RedisService } from '@core/redis/redis.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly authService: AuthService,
+    private readonly redisService: RedisService,
   ) {}
 
   async register({
@@ -74,6 +76,14 @@ export class UsersService {
   }: SearchUserDto): Promise<
     PaginatedResponseDto<Omit<Prisma.UserGetPayload<object>, 'password'>>
   > {
+    const cacheKey = `users:findAll:${email ?? ''}:${page}:${limit}:${skip}`;
+    const cached = await this.redisService.get(cacheKey);
+    if (cached) {
+      return cached as PaginatedResponseDto<
+        Omit<Prisma.UserGetPayload<object>, 'password'>
+      >;
+    }
+
     const where: Prisma.UserWhereInput = {
       ...(email && { email: { contains: email, mode: 'insensitive' } }),
     };
@@ -89,7 +99,9 @@ export class UsersService {
       this.prisma.user.count({ where }),
     ]);
 
-    return {
+    const result: PaginatedResponseDto<
+      Omit<Prisma.UserGetPayload<object>, 'password'>
+    > = {
       message: 'Lấy danh sách người dùng thành công',
       data: users,
       pagination: {
@@ -99,6 +111,10 @@ export class UsersService {
         totalPages: Math.ceil(total / limit),
       },
     };
+
+    await this.redisService.set(cacheKey, result);
+
+    return result;
   }
 
   async findById(id: string) {

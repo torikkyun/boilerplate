@@ -4,4 +4,8 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   await CommandFactory.run(AppModule);
 }
-bootstrap();
+
+bootstrap().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
