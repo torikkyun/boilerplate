@@ -1,8 +1,6 @@
-import { CacheModule } from '@nestjs/cache-manager';
+import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
-import KeyvRedis from '@keyv/redis';
-import { Keyv } from 'keyv';
-import { CacheableMemory } from 'cacheable';
+import { createKeyv } from '@keyv/redis';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RedisService } from './redis.service';
 
@@ -11,22 +9,25 @@ import { RedisService } from './redis.service';
     CacheModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        return {
-          stores: [
-            new Keyv({
-              store: new CacheableMemory({
-                ttl: configService.get<number>('CACHE_TTL')!,
-                lruSize: configService.get<number>('CACHE_LRU_SIZE')!,
-              }),
-            }),
-            new KeyvRedis(configService.get<string>('REDIS_URL')),
-          ],
-        };
-      },
+      useFactory: (configService: ConfigService) => ({
+        stores: [
+          createKeyv(configService.get<string>('REDIS_URL'), {
+            namespace: 'nest',
+            keyPrefixSeparator: '::',
+          }),
+        ],
+        ttl: configService.get<number>('CACHE_TTL'),
+        max: configService.get<number>('CACHE_LRU_SIZE'),
+      }),
     }),
   ],
-  providers: [RedisService],
+  providers: [
+    RedisService,
+    {
+      provide: 'APP_INTERCEPTOR',
+      useClass: CacheInterceptor,
+    },
+  ],
   exports: [RedisService],
 })
 export class RedisModule {}
