@@ -1,13 +1,15 @@
 import { Module } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { UsersController } from './users.controller';
-import { PrismaService } from '@core/prisma/prisma.service';
-import { AuthModule } from '@core/auth/auth.module';
+import { UsersService } from './services/users.service';
+import { UsersController } from './controllers/users.controller';
 import { RedisModule } from '@core/redis/redis.module';
+import { AuthenticationModule } from '@core/authentication/authentication.module';
+import { AuthService } from './services/auth.service';
+import { AuthController } from './controllers/auth.controller';
+import { UserRepository } from './repositories/user.repository';
 
 @Module({
-  imports: [AuthModule, RedisModule],
-  controllers: [UsersController],
-  providers: [UsersService, PrismaService],
+  imports: [AuthenticationModule, RedisModule],
+  controllers: [UsersController, AuthController],
+  providers: [UsersService, AuthService, UserRepository],
 })
 export class UsersModule {}

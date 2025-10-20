@@ -1,7 +1,7 @@
 import { SeedDatabaseCommand } from '@commands/seed-database.command';
-import { AuthModule } from '@core/auth/auth.module';
-import { JwtGuard } from '@core/auth/guards/jwt.guard';
-import { RolesGuard } from '@core/auth/guards/roles.guard';
+import { AuthModule } from '@core/authentication/auth.module';
+import { JwtGuard } from '@core/authentication/guards/jwt.guard';
+import { RolesGuard } from '@core/authentication/guards/roles.guard';
 import { PrismaService } from '@core/prisma/prisma.service';
 import { ProfilesModule } from '@modules/profiles/profiles.module';
 import { UsersModule } from '@modules/users/users.module';

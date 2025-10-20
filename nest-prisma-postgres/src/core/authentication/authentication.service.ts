@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from 'generated/prisma';
 
 @Injectable()
-export class AuthService {
+export class AuthenticationService {
   constructor(private readonly jwtService: JwtService) {}
 
   async generateAccessToken(user: User): Promise<string> {
