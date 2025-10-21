@@ -23,10 +23,7 @@ export class AuthService {
     name,
     age,
   }: RegisterUserDto): Promise<{ message: string; email: string }> {
-    const user = await this.userRepository.model.findUnique({
-      where: { email },
-      select: { id: true },
-    });
+    const user = await this.userRepository.findByEmail(email);
 
     if (user) {
       throw new ConflictException('Email đã được đăng ký');
@@ -34,14 +31,12 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await this.userRepository.model.create({
-      data: {
-        email,
-        password: hashedPassword,
-        name,
-        Profile: {
-          create: { age },
-        },
+    await this.userRepository.create({
+      email,
+      password: hashedPassword,
+      name,
+      Profile: {
+        create: { age },
       },
     });
 
@@ -56,9 +51,7 @@ export class AuthService {
     user: Omit<User, 'password'>;
     accessToken: string;
   }> {
-    const user = await this.userRepository.model.findUnique({
-      where: { email },
-    });
+    const user = await this.userRepository.findByEmailWithPassword(email);
 
     if (user && (await bcrypt.compare(password, user.password))) {
       const { password: _password, ...userData } = user;

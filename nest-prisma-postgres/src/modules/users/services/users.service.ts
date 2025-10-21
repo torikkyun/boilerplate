@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Prisma } from 'generated/prisma';
 import { PaginatedResponseDto } from '@common/dtos/pagination.dto';
 import { SearchUserDto } from '../dto/search-user.dto';
@@ -21,7 +21,7 @@ export class UsersService {
     };
 
     const [users, total] = await Promise.all([
-      this.userRepository.findMany({
+      this.userRepository.findAll({
         where,
         skip,
         take: limit,

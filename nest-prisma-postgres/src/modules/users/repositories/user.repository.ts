@@ -18,29 +18,24 @@ export class UserRepository
     return this.prisma.user;
   }
 
-  async findMany(args: {
-    where?: Prisma.UserWhereInput;
-    skip?: number;
-    take?: number;
-    orderBy?: Prisma.UserOrderByWithRelationInput;
-  }): Promise<Array<Omit<Prisma.UserGetPayload<object>, 'password'>>> {
-    return this.model.findMany({
-      where: args.where,
-      skip: args.skip,
-      take: args.take,
-      orderBy: args.orderBy,
-    });
+  findByEmail(email: string): Promise<Prisma.UserGetPayload<object> | null> {
+    return this.model.findUnique({ where: { email } });
   }
 
-  async count(where?: Prisma.UserWhereInput): Promise<number> {
-    return this.model.count({ where });
-  }
-
-  async findById(
-    id: string,
-  ): Promise<Omit<Prisma.UserGetPayload<object>, 'password'> | null> {
+  findByEmailWithPassword(
+    email: string,
+  ): Promise<Prisma.UserGetPayload<object> | null> {
     return this.model.findUnique({
-      where: { id },
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        password: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+      },
     });
   }
 }

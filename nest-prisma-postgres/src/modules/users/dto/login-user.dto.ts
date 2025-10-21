@@ -3,7 +3,7 @@ import { IsEmail, MinLength } from 'class-validator';
 
 export class LoginUserDto {
   @IsEmail()
-  @ApiProperty({ example: 'duc@gmail.com' })
+  @ApiProperty({ example: 'admin@gmail.com' })
   email: string;
 
   @MinLength(6)
