@@ -53,6 +53,7 @@ export class SeedDatabaseCommand extends CommandRunner {
             },
           },
         });
+
         console.log(`👤 Người dùng đã được tạo: ${userData.email}`);
       }
 

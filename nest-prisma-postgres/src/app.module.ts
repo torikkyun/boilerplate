@@ -1,5 +1,4 @@
 import { SeedDatabaseCommand } from '@commands/seed-database.command';
-import { AuthModule } from '@core/authentication/auth.module';
 import { JwtGuard } from '@core/authentication/guards/jwt.guard';
 import { RolesGuard } from '@core/authentication/guards/roles.guard';
 import { PrismaService } from '@core/prisma/prisma.service';
@@ -7,7 +6,6 @@ import { ProfilesModule } from '@modules/profiles/profiles.module';
 import { UsersModule } from '@modules/users/users.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { RedisModule } from './core/redis/redis.module';
 
 @Module({
   imports: [
@@ -16,10 +14,9 @@ import { RedisModule } from './core/redis/redis.module';
       envFilePath: [`.env.${process.env.NODE_ENV}.local`],
       expandVariables: true,
     }),
-    AuthModule,
     UsersModule,
     ProfilesModule,
-    RedisModule,
+    // RedisModule,
   ],
   providers: [
     SeedDatabaseCommand,

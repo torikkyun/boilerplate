@@ -1,5 +1,4 @@
-import { PrismaService } from '@core/prisma/prisma.service';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Prisma } from 'generated/prisma';
 import { PaginatedResponseDto } from '@common/dtos/pagination.dto';
 import { SearchUserDto } from '../dto/search-user.dto';
@@ -22,14 +21,13 @@ export class UsersService {
     };
 
     const [users, total] = await Promise.all([
-      this.userRepository.model.findMany({
+      this.userRepository.findMany({
         where,
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
-        omit: { password: true },
       }),
-      this.userRepository.model.count({ where }),
+      this.userRepository.count(where),
     ]);
 
     const result: PaginatedResponseDto<
@@ -49,6 +47,6 @@ export class UsersService {
   }
 
   async findById(id: string) {
-    return this.userRepository.model.findUnique({ where: { id } });
+    return this.userRepository.findById(id);
   }
 }
