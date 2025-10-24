@@ -1,4 +1,3 @@
-import { PrismaService } from '@core/database/prisma/prisma.service';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';

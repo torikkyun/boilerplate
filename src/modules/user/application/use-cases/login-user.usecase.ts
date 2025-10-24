@@ -1,4 +1,4 @@
-import { AuthenticationService } from '@core/authentication/authentication.service';
+import { AuthService } from '@core/auth/auth.service';
 import {
   UserRepositoryPort,
   USER_REPOSITORY,
@@ -9,7 +9,7 @@ export class LoginUserUseCase {
   constructor(
     @Inject(USER_REPOSITORY)
     private readonly userRepository: UserRepositoryPort,
-    private readonly authenticationService: AuthenticationService,
+    private readonly authService: AuthService,
   ) {}
 
   async execute(props: { email: string; password: string }): Promise<string> {
@@ -18,6 +18,6 @@ export class LoginUserUseCase {
     const isMatch = await user.password.compare(props.password);
     if (!isMatch) throw new BadRequestException('Mật khẩu không hợp lệ');
 
-    return this.authenticationService.generateAccessToken(user.id);
+    return this.authService.generateAccessToken(user.id);
   }
 }

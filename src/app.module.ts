@@ -1,7 +1,6 @@
 import { SeedDatabaseCommand } from '@commands/seed-database.command';
-import { AuthenticationModule } from '@core/authentication/authentication.module';
-import { JwtGuard } from '@core/authentication/guards/jwt.guard';
-import { RolesGuard } from '@core/authentication/guards/roles.guard';
+import { JwtGuard } from '@core/auth/guards/jwt.guard';
+import { RolesGuard } from '@core/auth/guards/roles.guard';
 import { PrismaService } from '@core/database/prisma/prisma.service';
 import { UserModule } from '@modules/user/user.module';
 import { Module } from '@nestjs/common';

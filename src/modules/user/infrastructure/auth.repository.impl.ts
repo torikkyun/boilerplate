@@ -1,4 +1,4 @@
-import { IAuthService } from '@core/authentication/interfaces/auth-service.interface';
+import { IAuthService } from '@core/auth/interfaces/auth-service.interface';
 import { PrismaUserRepositoryImpl } from './prisma-user.repository.impl';
 import { Role } from 'generated/prisma';
 import { Inject } from '@nestjs/common';

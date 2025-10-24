@@ -1,5 +1,5 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { AuthenticationService } from './authentication.service';
+import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -23,7 +23,7 @@ import { UserModule } from '@modules/user/user.module';
     }),
     forwardRef(() => UserModule),
   ],
-  providers: [AuthenticationService, PrismaService, JwtStrategy, LocalStrategy],
-  exports: [AuthenticationService],
+  providers: [AuthService, PrismaService, JwtStrategy, LocalStrategy],
+  exports: [AuthService],
 })
-export class AuthenticationModule {}
+export class AuthModule {}
