@@ -1,4 +1,3 @@
-import { SeedDatabaseCommand } from '@commands/seed-database.command';
 import { JwtGuard } from '@common/guards/jwt.guard';
 import { RolesGuard } from '@common/guards/roles.guard';
 import { PrismaService } from '@core/database/prisma/prisma.service';
@@ -17,7 +16,6 @@ import { APP_GUARD } from '@nestjs/core';
     UserModule,
   ],
   providers: [
-    SeedDatabaseCommand,
     PrismaService,
     {
       provide: APP_GUARD,

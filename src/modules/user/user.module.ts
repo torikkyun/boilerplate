@@ -22,6 +22,6 @@ import { PassportModule } from '@nestjs/passport';
     LoginUserUseCase,
     JwtStrategy,
   ],
-  exports: [USER_REPOSITORY],
+  exports: [USER_REPOSITORY, RegisterUserUseCase],
 })
 export class UserModule {}
