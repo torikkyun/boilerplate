@@ -1,17 +1,19 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { Role } from 'generated/prisma';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { IAuthService } from '../interfaces/auth-service.interface';
-import { AUTH_SERVICE } from '../interfaces/auth-service.interface';
+import { UserRole } from '@common/enums/user-role.enum';
+import {
+  UserRepositoryPort,
+  USER_REPOSITORY,
+} from '@modules/user/application/ports/user.repository.port';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     private readonly configService: ConfigService,
-    @Inject(AUTH_SERVICE)
-    private readonly authService: IAuthService,
+    @Inject(USER_REPOSITORY)
+    private readonly userRepository: UserRepositoryPort,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -20,13 +22,13 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate({ id }: { id: string; role: Role }) {
-    const user = await this.authService.validateUserById(id);
+  async validate({ id }: { id: string; role: UserRole }) {
+    const user = await this.userRepository.findById(id);
 
     if (!user) {
       throw new UnauthorizedException('Token không hợp lệ hoặc đã hết hạn');
     }
 
-    return { id, role: user.role };
+    return { id: user.id, role: user.role };
   }
 }
