@@ -1,16 +1,13 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { UserRole } from '@modules/user/entities/user.entity';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { Role } from 'generated/prisma';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { IAuthService } from '../interfaces/auth-service.interface';
-import { AUTH_SERVICE } from '../interfaces/auth-service.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     private readonly configService: ConfigService,
-    @Inject(AUTH_SERVICE)
     private readonly authService: IAuthService,
   ) {
     super({
@@ -20,7 +17,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate({ id }: { id: string; role: Role }) {
+  async validate({ id }: { id: string; role: UserRole }) {
     const user = await this.authService.validateUserById(id);
 
     if (!user) {
