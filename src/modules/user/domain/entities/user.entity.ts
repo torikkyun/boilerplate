@@ -1,6 +1,6 @@
 import { UserRole } from '@common/enums/user-role.enum';
-import { EmailVO } from './email.vo';
-import { PasswordVO } from './password.vo';
+import { EmailVO } from '../value-objects/email.vo';
+import { PasswordVO } from '../value-objects/password.vo';
 
 export class User {
   private constructor(
