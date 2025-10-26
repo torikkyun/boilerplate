@@ -1,22 +1,23 @@
-import { JwtGuard } from '@common/guards/jwt.guard';
-import { RolesGuard } from '@common/guards/roles.guard';
-import { PrismaService } from '@core/database/prisma/prisma.service';
-import { UserModule } from '@modules/user/user.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { UserModule } from './modules/user/user.module';
+import { DatabaseModule } from '@core/database/database.module';
 import { APP_GUARD } from '@nestjs/core';
+import { JwtGuard } from '@common/guards/jwt.guard';
+import { RoleModule } from './modules/role/role.module';
+import configuration from './config/configuration';
+import { RolesGuard } from '@common/guards/roles.guard';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: `.env.${process.env.NODE_ENV}.local`,
-      expandVariables: true,
+      load: [configuration],
     }),
+    DatabaseModule,
+    RoleModule,
     UserModule,
   ],
   providers: [
-    PrismaService,
     {
       provide: APP_GUARD,
       useClass: JwtGuard,

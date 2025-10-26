@@ -1,27 +1,36 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from '@modules/auth/auth.module';
-import { AuthController } from './presentation/auth.controller';
-import { PrismaService } from '@core/database/prisma/prisma.service';
-import { RegisterUserUseCase } from './application/use-cases/register-user.usecase';
-import { LoginUserUseCase } from './application/use-cases/login-user.usecase';
-import { PrismaUserRepositoryImpl } from './infrastructure/prisma-user.repository.impl';
-import { USER_REPOSITORY } from './application/ports/user.repository.port';
-import { JwtStrategy } from '@common/strategies/jwt.strategy';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserService } from './services/user.service';
+import { UserController } from './controllers/user.controller';
+import { User } from './entities/user.entity';
+import { UserRepository } from './repositories/user.repository';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
+import { AuthController } from './controllers/auth.controller';
+import { AuthService } from './services/auth.service';
+import { RoleModule } from '@modules/role/role.module';
+import { JwtStrategy } from '@common/strategies/jwt.strategy';
 
 @Module({
-  imports: [AuthModule, PassportModule],
-  controllers: [AuthController],
-  providers: [
-    PrismaService,
-    {
-      provide: USER_REPOSITORY,
-      useClass: PrismaUserRepositoryImpl,
-    },
-    RegisterUserUseCase,
-    LoginUserUseCase,
-    JwtStrategy,
+  imports: [
+    ConfigModule,
+    JwtModule.registerAsync({
+      useFactory: (config: ConfigService) => ({
+        secret: config.get<string>('JWT_SECRET'),
+        signOptions: {
+          expiresIn: config.get('JWT_EXPIRATION')!,
+        },
+      }),
+      inject: [ConfigService],
+      imports: [ConfigModule],
+    }),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    TypeOrmModule.forFeature([User]),
+    RoleModule,
   ],
-  exports: [USER_REPOSITORY, RegisterUserUseCase],
+  controllers: [UserController, AuthController],
+  providers: [JwtModule, JwtStrategy, UserRepository, AuthService, UserService],
+  exports: [UserRepository],
 })
 export class UserModule {}
