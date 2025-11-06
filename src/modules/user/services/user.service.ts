@@ -1,35 +1,48 @@
-import { Injectable } from '@nestjs/common';
-import { UserRepository } from '../repositories/user.repository';
-import { User } from '../entities/user.entity';
-import { FindOptionsWhere, ILike } from 'typeorm';
-import { QueryUserDto } from '../dto/query-user.dto';
-import { RoleRepository } from '@modules/role/repositories/role.repository';
-import * as bcrypt from 'bcrypt';
+import { Role } from "@modules/role/entities/role.entity";
+import { Injectable } from "@nestjs/common";
+import * as bcrypt from "bcrypt";
+import { Repository } from "typeorm";
+import { QueryUserDto } from "../dto/query-user.dto";
+import { User } from "../entities/user.entity";
+
+const SALT = 12;
+const MAX_LIMIT = 100;
 
 @Injectable()
 export class UserService {
+  private readonly userRepository: Repository<User>;
+  private readonly roleRepository: Repository<Role>;
   constructor(
-    private readonly userRepository: UserRepository,
-    private readonly roleRepository: RoleRepository,
-  ) {}
+    userRepository: Repository<User>,
+    roleRepository: Repository<Role>
+  ) {
+    this.userRepository = userRepository;
+    this.roleRepository = roleRepository;
+  }
 
   async onModuleInit() {
     const existingUser = await this.userRepository.findOne({
-      email: 'admin@gmail.com',
+      where: { email: "admin@gmail.com" },
     });
 
     const adminRole = await this.roleRepository.findOne({
-      name: 'admin',
+      where: { name: "admin" },
     });
 
     if (!existingUser) {
-      await this.userRepository.create({
-        email: 'admin@gmail.com',
-        password: bcrypt.hashSync('Thisisapassword123', 10),
-        firstName: 'Admin',
-        lastName: 'User',
-        role: adminRole!,
-      });
+      if (!adminRole) {
+        throw new Error(
+          "Role 'admin' không tồn tại. Vui lòng khởi tạo role trước khi tạo user admin."
+        );
+      }
+
+      const adminUser = new User();
+      adminUser.email = "admin@gmail.com";
+      adminUser.password = bcrypt.hashSync("Thisisapassword123", SALT);
+      adminUser.firstName = "Admin";
+      adminUser.lastName = "User";
+      adminUser.role = adminRole;
+      await this.userRepository.save(adminUser);
     }
   }
 
@@ -39,14 +52,33 @@ export class UserService {
     page: number;
     limit: number;
   }> {
-    let where: FindOptionsWhere<User> | FindOptionsWhere<User>[] = {};
+    const pageNum = Math.max(1, Number(page) || 1);
+    const take = Math.min(Math.max(1, Number(limit) || 10), MAX_LIMIT);
+    const skip = (pageNum - 1) * take;
+
+    const query = this.userRepository
+      .createQueryBuilder("user")
+      .leftJoinAndSelect("user.role", "role")
+      .select([
+        "user.id",
+        "user.email",
+        "user.fullName",
+        "user.publicKey",
+        "role.name",
+      ])
+      .orderBy("user.id", "DESC")
+      .skip(skip)
+      .take(take);
+
     if (search) {
-      where = [
-        { email: ILike(`%${search}%`) },
-        { firstName: ILike(`%${search}%`) },
-        { lastName: ILike(`%${search}%`) },
-      ] as FindOptionsWhere<User>[];
+      query.andWhere(
+        "(user.email ILIKE :search OR user.fullName ILIKE :search)",
+        { search: `%${search}%` }
+      );
     }
-    return this.userRepository.paginate(page, limit, where);
+
+    const [data, total] = await query.getManyAndCount();
+
+    return { data, total, page: pageNum, limit: take };
   }
 }

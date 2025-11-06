@@ -1,7 +1,10 @@
-import { Controller } from '@nestjs/common';
-import { RoleService } from './role.service';
+import { Controller } from "@nestjs/common";
+import type { RoleService } from "./role.service";
 
-@Controller('role')
+@Controller("role")
 export class RoleController {
-  constructor(private readonly roleService: RoleService) {}
+  private readonly roleService: RoleService;
+  constructor(roleService: RoleService) {
+    this.roleService = roleService;
+  }
 }

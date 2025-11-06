@@ -1,20 +1,24 @@
-import { ROLES_KEY } from '@common/decorators/roles.decorator';
+import { ROLES_KEY } from "@common/decorators/roles.decorator";
 import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
+  type CanActivate,
+  type ExecutionContext,
   ForbiddenException,
-} from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+  Injectable,
+} from "@nestjs/common";
+import type { Reflector } from "@nestjs/core";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  private readonly reflector: Reflector;
+
+  constructor(reflector: Reflector) {
+    this.reflector = reflector;
+  }
 
   canActivate(context: ExecutionContext): boolean {
     const requiredRoles = this.reflector.getAllAndOverride<string[]>(
       ROLES_KEY,
-      [context.getHandler(), context.getClass()],
+      [context.getHandler(), context.getClass()]
     );
 
     if (!requiredRoles) {
@@ -23,13 +27,13 @@ export class RolesGuard implements CanActivate {
 
     const { user } = context
       .switchToHttp()
-      .getRequest<{ user: { role?: string[] } }>();
+      .getRequest<{ user: { role: { name: string } } }>();
 
-    const hasRole = requiredRoles.some((role) => user.role?.includes(role));
+    const hasRole = requiredRoles.some((role) => user.role.name.includes(role));
 
     if (!hasRole) {
       throw new ForbiddenException(
-        'Bạn không có quyền truy cập tài nguyên này',
+        "Bạn không có quyền truy cập tài nguyên này"
       );
     }
 
