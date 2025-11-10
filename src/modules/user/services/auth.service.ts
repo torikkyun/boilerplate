@@ -86,7 +86,6 @@ export class AuthService {
 
     return {
       message: "Đăng nhập thành công",
-      user: { id: user.id, email: user.email },
       token,
     };
   }
