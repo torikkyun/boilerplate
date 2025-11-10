@@ -1,5 +1,6 @@
 import { Role } from "@modules/role/entities/role.entity";
 import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
 import * as bcrypt from "bcrypt";
 import { Repository } from "typeorm";
 import { QueryUserDto } from "../dto/query-user.dto";
@@ -13,7 +14,9 @@ export class UserService {
   private readonly userRepository: Repository<User>;
   private readonly roleRepository: Repository<Role>;
   constructor(
+    @InjectRepository(User)
     userRepository: Repository<User>,
+    @InjectRepository(Role)
     roleRepository: Repository<Role>
   ) {
     this.userRepository = userRepository;
@@ -59,22 +62,13 @@ export class UserService {
     const query = this.userRepository
       .createQueryBuilder("user")
       .leftJoinAndSelect("user.role", "role")
-      .select([
-        "user.id",
-        "user.email",
-        "user.fullName",
-        "user.publicKey",
-        "role.name",
-      ])
+      .select(["user.id", "user.email", "role.name"])
       .orderBy("user.id", "DESC")
       .skip(skip)
       .take(take);
 
     if (search) {
-      query.andWhere(
-        "(user.email ILIKE :search OR user.fullName ILIKE :search)",
-        { search: `%${search}%` }
-      );
+      query.andWhere("(user.email ILIKE :search)", { search: `%${search}%` });
     }
 
     const [data, total] = await query.getManyAndCount();

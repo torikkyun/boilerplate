@@ -79,7 +79,10 @@ export class AuthService {
       throw new ConflictException("Email hoặc mật khẩu không đúng");
     }
 
-    const token = this.jwtService.sign({ id: user.id, role: user.role.name });
+    const token = this.jwtService.sign({
+      id: user.id,
+      role: { name: user.role.name },
+    });
 
     return {
       message: "Đăng nhập thành công",

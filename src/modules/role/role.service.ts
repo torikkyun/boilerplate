@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Role } from "./entities/role.entity";
 
@@ -6,7 +7,10 @@ import { Role } from "./entities/role.entity";
 export class RoleService {
   private readonly roleRepository: Repository<Role>;
 
-  constructor(roleRepository: Repository<Role>) {
+  constructor(
+    @InjectRepository(Role)
+    roleRepository: Repository<Role>
+  ) {
     this.roleRepository = roleRepository;
   }
 
