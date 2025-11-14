@@ -1,21 +1,18 @@
-import { Role } from "@modules/role/entities/role.entity";
 import { ConflictException, Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { InjectRepository } from "@nestjs/typeorm";
 import * as bcrypt from "bcrypt";
 import { Repository } from "typeorm";
-import { LoginDto } from "../dto/login-user.dto";
-import { RegisterDto } from "../dto/register-user.dto";
-import { User } from "../entities/user.entity";
-
-const SALT = 12;
+import { Role } from "../role/entities/role.entity";
+import { User } from "../user/entities/user.entity";
+import { LoginDto } from "./dto/login.dto";
+import { RegisterDto } from "./dto/register.dto";
 
 @Injectable()
 export class AuthService {
   private readonly jwtService: JwtService;
   private readonly userRepository: Repository<User>;
   private readonly roleRepository: Repository<Role>;
-  private defaultRole: Role;
 
   constructor(
     jwtService: JwtService,
@@ -29,18 +26,6 @@ export class AuthService {
     this.roleRepository = roleRepository;
   }
 
-  async onModuleInit() {
-    const foundRole = await this.roleRepository.findOne({
-      where: { name: "user" },
-    });
-    if (!foundRole) {
-      throw new Error(
-        "Role 'user' không tồn tại. Vui lòng khởi tạo role trước khi đăng ký người dùng."
-      );
-    }
-    this.defaultRole = foundRole;
-  }
-
   async register({ email, password, ...rest }: RegisterDto) {
     const existingUser = await this.userRepository.findOne({
       where: { email },
@@ -50,11 +35,16 @@ export class AuthService {
       throw new ConflictException("Email đã được đăng ký");
     }
 
-    const hashedPassword = await bcrypt.hash(password, SALT);
+    const role = await this.roleRepository.findOne({ where: { name: "user" } });
+    if (!role) {
+      throw new ConflictException("Vai trò mặc định không tồn tại");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User();
     user.email = email;
     user.password = hashedPassword;
-    user.role = this.defaultRole;
+    user.role = role;
     Object.assign(user, rest);
 
     await this.userRepository.save(user);
@@ -68,7 +58,7 @@ export class AuthService {
   async login({ email, password }: LoginDto) {
     const user = await this.userRepository.findOne({
       where: { email },
-      relations: ["role"],
+      relations: { role: true },
     });
     if (!user) {
       throw new ConflictException("Email hoặc mật khẩu không đúng");

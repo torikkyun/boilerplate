@@ -1,5 +1,5 @@
+import { Role } from "@api/role/entities/role.entity";
 import { BaseEntity } from "@core/database/base.entity";
-import { Role } from "@modules/role/entities/role.entity";
 import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 
 @Entity("users")

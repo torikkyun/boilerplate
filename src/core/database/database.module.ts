@@ -9,7 +9,7 @@ import { SnakeNamingStrategy } from "typeorm-naming-strategies";
       useFactory: (configService: ConfigService) => ({
         type: "postgres",
         url: configService.get<string>("DATABASE_URL"),
-        entities: [`${__dirname}/../../modules/**/entities/*.entity{.ts,.js}`],
+        entities: [`${__dirname}/../../api/**/entities/*.entity{.ts,.js}`],
         synchronize: configService.get("NODE_ENV") !== "production",
         namingStrategy: new SnakeNamingStrategy(),
       }),

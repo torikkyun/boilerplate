@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsOptional } from "class-validator";
-import { LoginDto } from "./login-user.dto";
+import { LoginDto } from "./login.dto";
 
 export class RegisterDto extends LoginDto {
   @IsNotEmpty()

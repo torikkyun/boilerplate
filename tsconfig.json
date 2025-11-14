@@ -23,7 +23,7 @@
       "@core/*": ["src/core/*"],
       "@events/*": ["src/events/*"],
       "@integrations/*": ["src/integrations/*"],
-      "@modules/*": ["src/modules/*"]
+      "@api/*": ["src/api/*"]
     }
   }
 }
