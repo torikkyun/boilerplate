@@ -1,11 +1,10 @@
-import { ApiModule } from "@api/api.module";
-import { JwtGuard } from "@common/guards/jwt.guard";
-import { RolesGuard } from "@common/guards/roles.guard";
-import { RedisModule } from "@core/cache/redis.module";
-import { DatabaseModule } from "@core/database/database.module";
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { APP_GUARD, Reflector } from "@nestjs/core";
+import { RedisModule } from "src/cache/redis.module";
+import { ApiModule } from "./api/api.module";
+import { JwtGuard } from "./common/guards/jwt.guard";
+import { RolesGuard } from "./common/guards/roles.guard";
 import configuration from "./config/configuration";
 
 const guards = [JwtGuard, RolesGuard];
@@ -15,7 +14,6 @@ const guards = [JwtGuard, RolesGuard];
     ConfigModule.forRoot({
       load: [configuration],
     }),
-    DatabaseModule,
     RedisModule,
     ApiModule,
   ],

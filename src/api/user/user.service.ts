@@ -1,41 +1,49 @@
 import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Prisma, User } from "generated/prisma/client";
+import { PrismaService } from "src/prisma/prisma.service";
 import { QueryUserDto } from "./dto/query-user.dto";
-import { User } from "./entities/user.entity";
-
-const MAX_LIMIT = 100;
 
 @Injectable()
 export class UserService {
-  private readonly userRepository: Repository<User>;
-  constructor(
-    @InjectRepository(User)
-    userRepository: Repository<User>
-  ) {
-    this.userRepository = userRepository;
+  private readonly prisma: PrismaService;
+  constructor(prisma: PrismaService) {
+    this.prisma = prisma;
   }
 
-  async findAll({ page, limit, search }: QueryUserDto): Promise<{
+  async findAll({ page = 1, limit = 10, search }: QueryUserDto): Promise<{
     users: User[];
     total: number;
     page: number;
     limit: number;
   }> {
-    const pageNum = Math.max(1, Number(page) || 1);
-    const take = Math.min(Math.max(1, Number(limit) || 10), MAX_LIMIT);
-    const skip = (pageNum - 1) * take;
-    const query = this.userRepository
-      .createQueryBuilder("user")
-      .leftJoinAndSelect("user.role", "role")
-      .select(["user.id", "user.email", "role.name"])
-      .orderBy("user.id", "DESC")
-      .skip(skip)
-      .take(take);
-    if (search) {
-      query.andWhere("(user.email ILIKE :search)", { search: `%${search}%` });
-    }
-    const [users, total] = await query.getManyAndCount();
-    return { users, total, page: pageNum, limit: take };
+    const take = limit;
+    const skip = (page - 1) * limit;
+
+    const where: Prisma.UserWhereInput = search
+      ? {
+          OR: [
+            { name: { contains: search, mode: "insensitive" } },
+            { email: { contains: search, mode: "insensitive" } },
+          ],
+        }
+      : {};
+
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        include: { role: true },
+        where,
+        skip,
+        take,
+        orderBy: { createdAt: "desc" },
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+
+    return {
+      users,
+      total,
+      page,
+      limit,
+    };
   }
 }

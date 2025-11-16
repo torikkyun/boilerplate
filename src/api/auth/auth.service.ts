@@ -1,33 +1,21 @@
 import { ConflictException, Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { InjectRepository } from "@nestjs/typeorm";
 import * as bcrypt from "bcrypt";
-import { Repository } from "typeorm";
-import { Role } from "../role/entities/role.entity";
-import { User } from "../user/entities/user.entity";
+import { PrismaService } from "src/prisma/prisma.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 
 @Injectable()
 export class AuthService {
   private readonly jwtService: JwtService;
-  private readonly userRepository: Repository<User>;
-  private readonly roleRepository: Repository<Role>;
-
-  constructor(
-    jwtService: JwtService,
-    @InjectRepository(User)
-    userRepository: Repository<User>,
-    @InjectRepository(Role)
-    roleRepository: Repository<Role>
-  ) {
+  private readonly prisma: PrismaService;
+  constructor(jwtService: JwtService, prisma: PrismaService) {
     this.jwtService = jwtService;
-    this.userRepository = userRepository;
-    this.roleRepository = roleRepository;
+    this.prisma = prisma;
   }
 
   async register({ email, password, ...rest }: RegisterDto) {
-    const existingUser = await this.userRepository.findOne({
+    const existingUser = await this.prisma.user.findUnique({
       where: { email },
     });
 
@@ -35,19 +23,21 @@ export class AuthService {
       throw new ConflictException("Email đã được đăng ký");
     }
 
-    const role = await this.roleRepository.findOne({ where: { name: "user" } });
+    const role = await this.prisma.role.findUnique({ where: { name: "user" } });
     if (!role) {
       throw new ConflictException("Vai trò mặc định không tồn tại");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User();
-    user.email = email;
-    user.password = hashedPassword;
-    user.role = role;
-    Object.assign(user, rest);
 
-    await this.userRepository.save(user);
+    const user = await this.prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        roleId: role.id,
+        ...rest,
+      },
+    });
 
     return {
       message: "Đăng ký thành công",
@@ -56,9 +46,9 @@ export class AuthService {
   }
 
   async login({ email, password }: LoginDto) {
-    const user = await this.userRepository.findOne({
+    const user = await this.prisma.user.findUnique({
       where: { email },
-      relations: { role: true },
+      include: { role: true },
     });
     if (!user) {
       throw new ConflictException("Email hoặc mật khẩu không đúng");
