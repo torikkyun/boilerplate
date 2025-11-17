@@ -11,7 +11,7 @@
     "start": "nest start",
     "db:dev": "dotenv -e .env.development.local -- prisma migrate dev && prisma generate",
     "reset:dev": "dotenv -e .env.development.local -- prisma migrate reset --force",
-    "seed:dev": "dotenv -e .env.development.local -- ts-node -r tsconfig-paths/register src/prisma/seed.ts --environment development",
+    "seed:dev": "dotenv -e .env.development.local -- ts-node -r tsconfig-paths/register prisma/seeds/seed.ts --environment development",
     "start:dev": "dotenv -e .env.development.local -- nest start --watch",
     "start:debug": "dotenv -e .env.development.local -- nest start --debug --watch",
     "start:prod": "node dist/main",

@@ -22,8 +22,9 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new TransformInterceptor());
 
+  const swagger = configService.get("swagger");
   const config = new DocumentBuilder()
-    .setTitle(configService.get("SWAGGER_TITLE") ?? "Nest Boilerplate API")
+    .setTitle(swagger.title)
     .setDescription("Made with ❤️ by @torikkyun")
     .setVersion("1.0")
     .addBearerAuth({
@@ -36,7 +37,7 @@ async function bootstrap() {
     .build();
 
   SwaggerModule.setup(
-    configService.get("SWAGGER_PATH") ?? "swagger",
+    swagger.path,
     app,
     SwaggerModule.createDocument(app, config)
   );

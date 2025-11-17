@@ -10,16 +10,19 @@ import { UserAwareCacheInterceptor } from "./user-aware-cache.interceptor";
     CacheModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        stores: [
-          createKeyv(configService.get<string>("REDIS_URL"), {
-            namespace: "nest",
-            keyPrefixSeparator: ":",
-          }),
-        ],
-        ttl: configService.get<number>("CACHE_TTL"),
-        max: configService.get<number>("CACHE_LRU_SIZE"),
-      }),
+      useFactory: (configService: ConfigService) => {
+        const redisConfig = configService.get("redis");
+        return {
+          stores: [
+            createKeyv(redisConfig.url, {
+              namespace: "nest",
+              keyPrefixSeparator: ":",
+            }),
+          ],
+          ttl: redisConfig.ttl,
+          max: redisConfig.lruSize,
+        };
+      },
     }),
   ],
   providers: [

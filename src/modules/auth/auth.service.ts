@@ -1,7 +1,7 @@
 import { ConflictException, Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import * as bcrypt from "bcrypt";
-import { PrismaService } from "src/prisma/prisma.service";
+import { comparePassword, hashPassword } from "src/common/utils/hash.util";
+import { PrismaService } from "src/database/prisma.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 
@@ -28,7 +28,7 @@ export class AuthService {
       throw new ConflictException("Vai trò mặc định không tồn tại");
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = hashPassword(password);
 
     const user = await this.prisma.user.create({
       data: {
@@ -54,7 +54,7 @@ export class AuthService {
       throw new ConflictException("Email hoặc mật khẩu không đúng");
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = comparePassword(password, user.password);
     if (!isPasswordValid) {
       throw new ConflictException("Email hoặc mật khẩu không đúng");
     }
