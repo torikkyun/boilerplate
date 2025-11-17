@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { Prisma, User } from "generated/prisma/client";
+import { Prisma } from "generated/prisma/client";
 import { getOffsetPagination } from "src/common/utils/pagination.util";
 import { PrismaService } from "src/database/prisma.service";
+import { userWithRoleSelect } from "./constants/user.select";
 import { QueryUserDto } from "./dto/query-user.dto";
 
 @Injectable()
@@ -25,7 +26,7 @@ export class UserService {
 
     const [users, total] = await Promise.all([
       this.prisma.user.findMany({
-        include: { role: true },
+        select: userWithRoleSelect,
         where,
         skip,
         take,
@@ -42,10 +43,10 @@ export class UserService {
     };
   }
 
-  async findById(id: string): Promise<User> {
+  async findById(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      include: { role: true },
+      select: userWithRoleSelect,
     });
 
     if (!user) {
