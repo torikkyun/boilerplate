@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { Prisma, User } from "generated/prisma/client";
 import { getOffsetPagination } from "src/common/utils/pagination.util";
 import { PrismaService } from "src/database/prisma.service";
@@ -11,12 +11,7 @@ export class UserService {
     this.prisma = prisma;
   }
 
-  async findAll({ page = 1, limit = 10, search }: QueryUserDto): Promise<{
-    users: User[];
-    total: number;
-    page: number;
-    limit: number;
-  }> {
+  async findAll({ page = 1, limit = 10, search }: QueryUserDto) {
     const { take, skip } = getOffsetPagination(page, limit);
 
     const where: Prisma.UserWhereInput = search
@@ -47,10 +42,16 @@ export class UserService {
     };
   }
 
-  async findById(id: string): Promise<User | null> {
-    return await this.prisma.user.findUnique({
+  async findById(id: string): Promise<User> {
+    const user = await this.prisma.user.findUnique({
       where: { id },
       include: { role: true },
     });
+
+    if (!user) {
+      throw new NotFoundException(`Người dùng với ID ${id} không tồn tại`);
+    }
+
+    return user;
   }
 }
