@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import { IsInt, IsOptional, Min } from "class-validator";
 
-export class PaginationQueryDto {
+export class OffsetPaginationQueryDto {
   @IsOptional()
   @Type(() => Number)
   @IsInt()

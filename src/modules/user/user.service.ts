@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { Prisma, User } from "generated/prisma/client";
+import { getOffsetPagination } from "src/common/utils/pagination.util";
 import { PrismaService } from "src/database/prisma.service";
 import { QueryUserDto } from "./dto/query-user.dto";
 
@@ -16,8 +17,7 @@ export class UserService {
     page: number;
     limit: number;
   }> {
-    const take = limit;
-    const skip = (page - 1) * limit;
+    const { take, skip } = getOffsetPagination(page, limit);
 
     const where: Prisma.UserWhereInput = search
       ? {
@@ -45,5 +45,12 @@ export class UserService {
       page,
       limit,
     };
+  }
+
+  async findById(id: string): Promise<User | null> {
+    return await this.prisma.user.findUnique({
+      where: { id },
+      include: { role: true },
+    });
   }
 }

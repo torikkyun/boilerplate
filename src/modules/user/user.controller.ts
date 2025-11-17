@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from "@nestjs/common";
+import { Controller, Get, Param, ParseUUIDPipe, Query } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { Roles } from "src/common/decorators/roles.decorator";
 import { QueryUserDto } from "./dto/query-user.dto";
@@ -17,5 +17,11 @@ export class UserController {
   @Roles("admin")
   findAll(@Query() query: QueryUserDto) {
     return this.userService.findAll(query);
+  }
+
+  @Get(":uuid")
+  @Roles("admin")
+  findById(@Param("uuid", new ParseUUIDPipe()) uuid: string) {
+    return this.userService.findById(uuid);
   }
 }
