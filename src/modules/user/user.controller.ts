@@ -16,18 +16,12 @@ export class UserController {
   @Get()
   @Roles("admin")
   async findAll(@Query() query: QueryUserDto) {
-    const result = await this.userService.findAll(query);
-    // return {
-    //   ...result,
-    //   users: result.users.map((user) => new UserEntity(user)),
-    // };
-    return { result };
+    return await this.userService.findAll(query);
   }
 
   @Get(":uuid")
   @Roles("admin")
   async findById(@Param("uuid", new ParseUUIDPipe()) uuid: string) {
-    const user = await this.userService.findById(uuid);
-    return user;
+    return await this.userService.findById(uuid);
   }
 }

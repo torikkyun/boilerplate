@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { Prisma } from "generated/prisma/client";
 import { getOffsetPagination } from "src/common/utils/pagination.util";
 import { PrismaService } from "src/database/prisma.service";
-import { userWithRoleSelect } from "./constants/user.select";
 import { QueryUserDto } from "./dto/query-user.dto";
 
 @Injectable()
@@ -26,7 +25,19 @@ export class UserService {
 
     const [users, total] = await Promise.all([
       this.prisma.user.findMany({
-        select: userWithRoleSelect,
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          createdAt: true,
+          updatedAt: true,
+          role: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
         where,
         skip,
         take,
@@ -46,7 +57,19 @@ export class UserService {
   async findById(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      select: userWithRoleSelect,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        createdAt: true,
+        updatedAt: true,
+        role: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
 
     if (!user) {
