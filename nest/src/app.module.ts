@@ -37,4 +37,4 @@ const guards = [JwtGuard, RolesGuard];
     })),
   ],
 })
-export class AppModule {}
+export class AppModule { }
