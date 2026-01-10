@@ -17,24 +17,25 @@ import { UserModule } from "./modules/user/user.module";
 const guards = [JwtGuard, RolesGuard];
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      load: [configuration, redisConfig, jwtConfig, swaggerConfig],
-    }),
-    PrismaModule,
-    // RedisModule,
-    LoggerModule,
-    HealthModule,
-    AuthModule,
-    RoleModule,
-    UserModule,
-  ],
-  providers: [
-    ...guards.map((Guard) => ({
-      provide: APP_GUARD,
-      useFactory: (reflector: Reflector) => new Guard(reflector),
-      inject: [Reflector],
-    })),
-  ],
+	imports: [
+		ConfigModule.forRoot({
+			load: [configuration, redisConfig, jwtConfig, swaggerConfig],
+		}),
+		PrismaModule,
+		// RedisModule,
+		LoggerModule,
+		HealthModule,
+		AuthModule,
+		RoleModule,
+		UserModule,
+	],
+
+	providers: [
+		...guards.map((Guard) => ({
+			provide: APP_GUARD,
+			useFactory: (reflector: Reflector) => new Guard(reflector),
+			inject: [Reflector],
+		})),
+	],
 })
-export class AppModule { }
+export class AppModule {}

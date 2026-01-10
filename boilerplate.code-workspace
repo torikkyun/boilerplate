@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "fastapi"
+		},
+		{
+			"path": "nest"
+		}
+	],
+	"settings": {}
+}

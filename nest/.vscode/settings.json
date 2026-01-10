@@ -1,0 +1,11 @@
+{
+	"editor.formatOnSave": true,
+	"editor.formatOnPaste": true,
+
+	"biome.lsp.bin": "C:/Users/nduc4/projects/biome.exe",
+	"editor.defaultFormatter": "biomejs.biome",
+	"editor.codeActionsOnSave": {
+		"source.fixAll.biome": "explicit",
+		"source.organizeImports.biome": "explicit"
+	}
+}
