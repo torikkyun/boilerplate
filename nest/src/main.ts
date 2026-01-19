@@ -1,30 +1,34 @@
-import { ValidationPipe } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
-import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
+import { ConfigService } from "@nestjs/config";
+import { ValidationPipe } from "@nestjs/common";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { TransformInterceptor } from "./common/interceptors/transform.interceptor";
-
-const PORT = 3000;
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { NestExpressApplication } from "@nestjs/platform-express";
+import { join } from "path";
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
 
   app.enableCors();
+
+  app.useStaticAssets(join(__dirname, "..", "uploads"), {
+    prefix: "/uploads/",
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
       transformOptions: { enableImplicitConversion: true },
-    })
+    }),
   );
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new TransformInterceptor());
 
-  const swagger = configService.get("swagger");
   const config = new DocumentBuilder()
-    .setTitle(swagger.title)
+    .setTitle("Nest Boilerplate API")
     .setDescription("Made with ❤️ by @torikkyun")
     .setVersion("1.0")
     .addBearerAuth({
@@ -37,12 +41,12 @@ async function bootstrap() {
     .build();
 
   SwaggerModule.setup(
-    swagger.path,
+    "swagger",
     app,
-    SwaggerModule.createDocument(app, config)
+    SwaggerModule.createDocument(app, config),
   );
 
-  await app.listen(configService.get("PORT") ?? PORT);
+  await app.listen(configService.get("PORT") ?? 3000);
 }
 
 bootstrap().catch(() => {
