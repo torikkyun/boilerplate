@@ -3,25 +3,23 @@ import {
   Injectable,
   UnauthorizedException,
 } from "@nestjs/common";
-import type { Reflector } from "@nestjs/core";
+import { Reflector } from "@nestjs/core";
 import { AuthGuard } from "@nestjs/passport";
 import type { Observable } from "rxjs";
 import { IS_PUBLIC_KEY } from "../decorators/public.decorator";
 
 @Injectable()
 export class JwtGuard extends AuthGuard("jwt") {
-  private readonly reflector: Reflector;
-  constructor(reflector: Reflector) {
+  constructor(private readonly reflector: Reflector) {
     super();
-    this.reflector = reflector;
   }
 
   canActivate(
-    context: ExecutionContext
+    context: ExecutionContext,
   ): Promise<boolean> | boolean | Observable<boolean> {
     const isPublic: boolean = this.reflector.getAllAndOverride<boolean>(
       IS_PUBLIC_KEY,
-      [context.getHandler(), context.getClass()]
+      [context.getHandler(), context.getClass()],
     );
 
     if (isPublic) {
@@ -34,7 +32,7 @@ export class JwtGuard extends AuthGuard("jwt") {
   handleRequest<TUser = unknown>(err: unknown, user: TUser): TUser {
     if (err || !user) {
       throw new UnauthorizedException(
-        "Bạn cần đăng nhập để truy cập tài nguyên này"
+        "Bạn cần đăng nhập để truy cập tài nguyên này",
       );
     }
 

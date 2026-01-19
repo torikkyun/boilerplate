@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "shadcn": {
+      "command": "npx",
+      "args": ["shadcn@latest", "mcp"]
+    },
+    // "context7": {
+    //   "command": "docker",
+    //   "args": ["run", "-i", "--rm", "context7-mcp"]
+    // },
+    "context7": {
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "ctx7sk-2c56ba29-c54d-4370-b7bf-22685ca41501"
+      }
+    }
+  }
+}

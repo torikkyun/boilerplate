@@ -4,21 +4,17 @@ import {
   ForbiddenException,
   Injectable,
 } from "@nestjs/common";
-import type { Reflector } from "@nestjs/core";
+import { Reflector } from "@nestjs/core";
 import { ROLES_KEY } from "../decorators/roles.decorator";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  private readonly reflector: Reflector;
-
-  constructor(reflector: Reflector) {
-    this.reflector = reflector;
-  }
+  constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
     const requiredRoles = this.reflector.getAllAndOverride<string[]>(
       ROLES_KEY,
-      [context.getHandler(), context.getClass()]
+      [context.getHandler(), context.getClass()],
     );
 
     if (!requiredRoles) {
@@ -33,7 +29,7 @@ export class RolesGuard implements CanActivate {
 
     if (!hasRole) {
       throw new ForbiddenException(
-        "Bạn không có quyền truy cập tài nguyên này"
+        "Bạn không có quyền truy cập tài nguyên này",
       );
     }
 

@@ -1,4 +1,9 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  OnModuleInit,
+} from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { comparePassword, hashPassword } from "src/common/utils/hash.util";
 import { PrismaService } from "src/database/prisma.service";
@@ -6,12 +11,39 @@ import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 
 @Injectable()
-export class AuthService {
-  private readonly jwtService: JwtService;
-  private readonly prisma: PrismaService;
-  constructor(jwtService: JwtService, prisma: PrismaService) {
-    this.jwtService = jwtService;
-    this.prisma = prisma;
+export class AuthService implements OnModuleInit {
+  private readonly logger = new Logger(AuthService.name);
+  private defaultRoleId: string;
+
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly prisma: PrismaService,
+  ) {}
+
+  private generateAccessToken(userId: string): string {
+    return this.jwtService.sign({ id: userId });
+  }
+
+  async onModuleInit() {
+    try {
+      this.logger.log("Initializing AuthService...");
+      const defaultRole = await this.prisma.role.findUnique({
+        where: { name: "user" },
+      });
+
+      if (!defaultRole) {
+        this.logger.error(
+          "Default role user not found in the database. Please run seed script: pnpm run seed:dev",
+        );
+        throw new Error("Default role user not found in the database");
+      }
+
+      this.defaultRoleId = defaultRole.id;
+      this.logger.log("AuthService initialized successfully");
+    } catch (error) {
+      this.logger.error("Failed to initialize AuthService", error);
+      throw error;
+    }
   }
 
   async register({ email, password, ...rest }: RegisterDto) {
@@ -35,6 +67,7 @@ export class AuthService {
         email,
         password: hashedPassword,
         roleId: role.id,
+        avatar: `https://api.dicebear.com/9.x/identicon/svg?seed=${encodeURIComponent(email)}&background=%23ffffff`,
         ...rest,
       },
     });
@@ -59,14 +92,11 @@ export class AuthService {
       throw new ConflictException("Email hoặc mật khẩu không đúng");
     }
 
-    const token = this.jwtService.sign({
-      id: user.id,
-      role: { name: user.role.name },
-    });
+    const accessToken = this.generateAccessToken(user.id);
 
     return {
       message: "Đăng nhập thành công",
-      token,
+      accessToken,
     };
   }
 }

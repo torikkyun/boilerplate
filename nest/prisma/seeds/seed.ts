@@ -2,8 +2,10 @@ import { parseArgs } from "node:util";
 import { PrismaPg } from "@prisma/adapter-pg";
 import * as bcrypt from "bcrypt";
 import { PrismaClient } from "generated/prisma/client";
+import "dotenv/config";
+import { hashPassword } from "src/common/utils/hash.util";
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg({ connectionString: process.env["DATABASE_URL"] });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
@@ -30,14 +32,21 @@ async function main() {
       });
 
       // Seed users
+      const adminEmail = "admin@gmail.com";
+
+      const getDicebearAvatar = (seed: string) => {
+        return `https://api.dicebear.com/9.x/identicon/svg?seed=${encodeURIComponent(seed)}&background=%23ffffff`;
+      };
+
       await prisma.user.upsert({
-        where: { email: "admin@example.com" },
+        where: { email: adminEmail },
         update: {},
         create: {
-          email: "admin@gmail.com",
-          password: await bcrypt.hash("Thisisapassword123", 10),
+          email: adminEmail,
+          password: hashPassword("Thisisapassword123"),
           name: "Admin",
           roleId: adminRole.id,
+          avatar: getDicebearAvatar(adminEmail),
         },
       });
 
