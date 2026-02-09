@@ -20,4 +20,20 @@ export class RedisService {
   del(key: string) {
     return this.cache.del(key);
   }
+
+  async clear() {
+    return this.cache.clear();
+  }
+
+  async getNumber(key: string, defaultValue = 1): Promise<number> {
+    const value = await this.cache.get<number>(key);
+    return typeof value === "number" ? value : defaultValue;
+  }
+
+  async bumpVersion(key: string): Promise<number> {
+    const current = await this.getNumber(key, 1);
+    const next = current + 1;
+    await this.cache.set(key, next);
+    return next;
+  }
 }

@@ -8,9 +8,7 @@ import jwtConfig from "./config/jwt.config";
 import redisConfig from "./config/redis.config";
 import { PrismaModule } from "./database/prisma.module";
 import { HealthModule } from "./infrastructure/health/health.module";
-import { LoggerModule } from "./infrastructure/logging/logger.module";
 import { AuthModule } from "./modules/auth/auth.module";
-import { RoleModule } from "./modules/role/role.module";
 import { UserModule } from "./modules/user/user.module";
 import { RedisModule } from "./infrastructure/cache/redis.module";
 
@@ -21,10 +19,8 @@ import { RedisModule } from "./infrastructure/cache/redis.module";
     }),
     PrismaModule,
     RedisModule,
-    LoggerModule,
     HealthModule,
     AuthModule,
-    RoleModule,
     UserModule,
   ],
 

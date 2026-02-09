@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Param,
-  ParseUUIDPipe,
   Query,
   Patch,
   Body,
@@ -17,6 +16,7 @@ import { QueryUserDto } from "./dto/query-user.dto";
 import { UserService } from "./user.service";
 import { CurrentUser } from "src/common/decorators/current-user.decorator";
 import { User } from "generated/prisma/client";
+import { AuthUser } from "src/common/types/auth-user.type";
 
 @Controller("api/users")
 @ApiTags("users")
@@ -25,7 +25,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get("profile")
-  async getProfile(@CurrentUser() { id }: User) {
+  async getProfile(@CurrentUser() { id }: AuthUser) {
     return this.userService.getProfile(id);
   }
 
@@ -35,9 +35,9 @@ export class UserController {
     return await this.userService.findAll(query);
   }
 
-  @Get(":uuid")
+  @Get(":id")
   @Roles("admin")
-  async findById(@Param("uuid", new ParseUUIDPipe()) uuid: string) {
-    return await this.userService.findById(uuid);
+  async findById(@Param("id") id: string) {
+    return await this.userService.findById(id);
   }
 }
